@@ -137,23 +137,23 @@ export default function HeroEditForm({ hero, onSave, onCancel, onDelete }) {
         </div>
         <div>
           <label className={labelClass}>Stars (0-5)</label>
-          <input
-            type="number"
-            inputMode="numeric"
+          <select
             value={form.stars}
-            onChange={e => set('stars', clamp(e.target.value, 0, 5) ?? 0)}
-            className={inputClass}
-          />
+            onChange={e => set('stars', parseInt(e.target.value))}
+            className={selectClass}
+          >
+            {[0, 1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
         </div>
         <div>
           <label className={labelClass}>Slivers (0-5 of 6)</label>
-          <input
-            type="number"
-            inputMode="numeric"
+          <select
             value={form.slivers}
-            onChange={e => set('slivers', clamp(e.target.value, 0, 5) ?? 0)}
-            className={inputClass}
-          />
+            onChange={e => set('slivers', parseInt(e.target.value))}
+            className={selectClass}
+          >
+            {[0, 1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
         </div>
         <div>
           <label className={labelClass}>Weapon Name</label>
@@ -204,14 +204,15 @@ export default function HeroEditForm({ hero, onSave, onCancel, onDelete }) {
             </div>
             <div>
               <label className={labelClass}>MF (1-5)</label>
-              <input
-                type="number"
-                inputMode="numeric"
+              <select
                 value={g.masterForgery ?? ''}
-                onChange={e => setGear(i, 'masterForgery', e.target.value === '' ? null : clamp(e.target.value, 1, 5))}
-                className={inputClass}
+                onChange={e => setGear(i, 'masterForgery', e.target.value === '' ? null : parseInt(e.target.value))}
+                className={selectClass}
                 disabled={g.rarity === 'Empty'}
-              />
+              >
+                <option value="">—</option>
+                {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
             </div>
           </div>
         </div>
@@ -234,13 +235,13 @@ export default function HeroEditForm({ hero, onSave, onCancel, onDelete }) {
               </div>
               <div className="w-16">
                 <label className={labelClass}>Lv</label>
-                <input
-                  type="number"
-                  inputMode="numeric"
+                <select
                   value={s.level}
-                  onChange={e => setSkill(cat, i, 'level', clamp(e.target.value, 1, 5) ?? 1)}
-                  className={inputClass}
-                />
+                  onChange={e => setSkill(cat, i, 'level', parseInt(e.target.value))}
+                  className={selectClass}
+                >
+                  {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
               </div>
               <button
                 onClick={() => removeSkill(cat, i)}
