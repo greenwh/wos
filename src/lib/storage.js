@@ -1,7 +1,23 @@
 import { SEED_DATA } from '../data/seed';
+import { seedRoadmapIfNeeded } from '../data/roadmapSeed';
 
 const STORAGE_KEY = 'wos-hero-tracker';
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
+
+function migrate(data) {
+  if (!data.version || data.version < 2) {
+    // v1 → v2: add empty roadmap to all chiefs
+    for (const chief of Object.values(data.chiefs)) {
+      if (!chief.roadmap) {
+        chief.roadmap = [];
+      }
+    }
+    data.version = 2;
+  }
+  // Seed Wally/Beav roadmaps if they exist but have no goals
+  seedRoadmapIfNeeded(data);
+  return data;
+}
 
 export function loadData() {
   try {
@@ -9,16 +25,20 @@ export function loadData() {
     if (raw) {
       const data = JSON.parse(raw);
       if (data && data.chiefs) {
-        data.version = data.version || CURRENT_VERSION;
-        return data;
+        const migrated = migrate(data);
+        if (migrated.version !== data.version) {
+          saveData(migrated);
+        }
+        return migrated;
       }
     }
   } catch (e) {
     console.error('Failed to load data from localStorage:', e);
   }
   // First load: seed and persist
-  saveData(SEED_DATA);
-  return SEED_DATA;
+  const seeded = migrate(structuredClone(SEED_DATA));
+  saveData(seeded);
+  return seeded;
 }
 
 export function saveData(data) {

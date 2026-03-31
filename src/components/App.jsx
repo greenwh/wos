@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { loadData, saveData } from '../lib/storage';
 import { importFile } from '../lib/import';
 import { exportChief } from '../lib/export';
+import { runAutoDetection } from '../lib/roadmap';
 import ChiefTabs from './ChiefTabs';
 import ChiefView from './ChiefView';
 import ActionBar from './ActionBar';
@@ -52,7 +53,11 @@ export default function App() {
       ...data,
       chiefs: {
         ...data.chiefs,
-        [chiefName]: { name: chiefName, heroes: importModal.heroes },
+        [chiefName]: {
+          name: chiefName,
+          heroes: importModal.heroes,
+          roadmap: data.chiefs[chiefName]?.roadmap || [],
+        },
       },
       activeChief: chiefName,
     };
@@ -67,11 +72,12 @@ export default function App() {
 
   const handleSaveHero = useCallback((oldName, updatedHero) => {
     const heroes = chief.heroes.map(h => h.name === oldName ? updatedHero : h);
+    const updatedRoadmap = runAutoDetection(chief.roadmap, heroes);
     const newData = {
       ...data,
       chiefs: {
         ...data.chiefs,
-        [activeChief]: { ...chief, heroes },
+        [activeChief]: { ...chief, heroes, roadmap: updatedRoadmap },
       },
     };
     updateData(newData);
@@ -131,6 +137,8 @@ export default function App() {
       {/* Hero roster */}
       <ChiefView
         chief={chief}
+        heroes={chief?.heroes}
+        roadmap={chief?.roadmap}
         onSaveHero={handleSaveHero}
         onDeleteHero={handleDeleteHero}
         onAddHero={handleAddHero}
