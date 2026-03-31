@@ -274,6 +274,7 @@ export default function App() {
       {activeView === 'buffs' && (
         <BuffTab
           buffStrategy={chief?.buffStrategy}
+          chiefName={activeChief}
           onUpdate={updateBuffStrategy}
           onGoToRoadmap={() => setActiveView('roadmap')}
         />
