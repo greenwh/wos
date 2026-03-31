@@ -1,8 +1,9 @@
 import { SEED_DATA } from '../data/seed';
 import { seedRoadmapIfNeeded } from '../data/roadmapSeed';
+import { seedBuffStrategyIfNeeded } from '../data/buffSeed';
 
 const STORAGE_KEY = 'wos-hero-tracker';
-const CURRENT_VERSION = 2;
+const CURRENT_VERSION = 3;
 
 function migrate(data) {
   if (!data.version || data.version < 2) {
@@ -14,8 +15,18 @@ function migrate(data) {
     }
     data.version = 2;
   }
-  // Seed Wally/Beav roadmaps if they exist but have no goals
+  if (data.version < 3) {
+    // v2 → v3: add empty buffStrategy to all chiefs
+    for (const chief of Object.values(data.chiefs)) {
+      if (!chief.buffStrategy) {
+        chief.buffStrategy = { items: [], preEventChecklist: [] };
+      }
+    }
+    data.version = 3;
+  }
+  // Seed Wally/Beav roadmaps and buff strategies if empty
   seedRoadmapIfNeeded(data);
+  seedBuffStrategyIfNeeded(data);
   return data;
 }
 

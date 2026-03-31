@@ -6,6 +6,7 @@ import { runAutoDetection } from '../lib/roadmap';
 import ChiefTabs from './ChiefTabs';
 import ChiefView from './ChiefView';
 import ActionBar from './ActionBar';
+import BuffTab from './BuffTab';
 
 function newHero() {
   return {
@@ -30,7 +31,7 @@ export default function App() {
   const [data, setData] = useState(() => loadData());
   const [activeChief, setActiveChief] = useState(data.activeChief);
   const [importModal, setImportModal] = useState(null);
-  const [showRoadmap, setShowRoadmap] = useState(false);
+  const [activeView, setActiveView] = useState('roster'); // 'roster' | 'roadmap' | 'buffs'
 
   const chief = data.chiefs[activeChief];
 
@@ -62,6 +63,7 @@ export default function App() {
           name: chiefName,
           heroes: importModal.heroes,
           roadmap,
+          buffStrategy: data.chiefs[chiefName]?.buffStrategy || { items: [], preEventChecklist: [] },
         },
       },
       activeChief: chiefName,
@@ -177,6 +179,18 @@ export default function App() {
     updateData(newData);
   }, [data, chief, activeChief, updateData]);
 
+  const updateBuffStrategy = useCallback((buffStrategy) => {
+    if (!chief) return;
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...chief, buffStrategy },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
   const handleToggleGoal = useCallback((goalId) => {
     if (!chief?.roadmap) return;
     const now = new Date().toISOString().slice(0, 10);
@@ -215,23 +229,55 @@ export default function App() {
       {/* Action bar */}
       <ActionBar onImport={handleImport} onExport={handleExport} />
 
-      {/* Hero roster */}
-      <ChiefView
-        chief={chief}
-        heroes={chief?.heroes}
-        roadmap={chief?.roadmap}
-        onSaveHero={handleSaveHero}
-        onDeleteHero={handleDeleteHero}
-        onAddHero={handleAddHero}
-        showRoadmap={showRoadmap}
-        onViewRoadmap={() => setShowRoadmap(true)}
-        onCloseRoadmap={() => setShowRoadmap(false)}
-        onToggleGoal={handleToggleGoal}
-        onAddGoal={handleAddGoal}
-        onUpdateGoal={handleUpdateGoal}
-        onDeleteGoal={handleDeleteGoal}
-        onReorderGoal={handleReorderGoal}
-      />
+      {/* View toggle */}
+      <ViewToggle activeView={activeView} onSelect={setActiveView} />
+
+      {/* Views */}
+      {activeView === 'roster' && (
+        <ChiefView
+          chief={chief}
+          heroes={chief?.heroes}
+          roadmap={chief?.roadmap}
+          onSaveHero={handleSaveHero}
+          onDeleteHero={handleDeleteHero}
+          onAddHero={handleAddHero}
+          showRoadmap={false}
+          onViewRoadmap={() => setActiveView('roadmap')}
+          onCloseRoadmap={() => setActiveView('roster')}
+          onToggleGoal={handleToggleGoal}
+          onAddGoal={handleAddGoal}
+          onUpdateGoal={handleUpdateGoal}
+          onDeleteGoal={handleDeleteGoal}
+          onReorderGoal={handleReorderGoal}
+        />
+      )}
+
+      {activeView === 'roadmap' && (
+        <ChiefView
+          chief={chief}
+          heroes={chief?.heroes}
+          roadmap={chief?.roadmap}
+          onSaveHero={handleSaveHero}
+          onDeleteHero={handleDeleteHero}
+          onAddHero={handleAddHero}
+          showRoadmap={true}
+          onViewRoadmap={() => {}}
+          onCloseRoadmap={() => setActiveView('roster')}
+          onToggleGoal={handleToggleGoal}
+          onAddGoal={handleAddGoal}
+          onUpdateGoal={handleUpdateGoal}
+          onDeleteGoal={handleDeleteGoal}
+          onReorderGoal={handleReorderGoal}
+        />
+      )}
+
+      {activeView === 'buffs' && (
+        <BuffTab
+          buffStrategy={chief?.buffStrategy}
+          onUpdate={updateBuffStrategy}
+          onGoToRoadmap={() => setActiveView('roadmap')}
+        />
+      )}
 
       {/* Import modal */}
       {importModal && (
@@ -242,6 +288,32 @@ export default function App() {
           onCancel={() => setImportModal(null)}
         />
       )}
+    </div>
+  );
+}
+
+const VIEW_TABS = [
+  { key: 'roster',  label: 'Roster' },
+  { key: 'roadmap', label: 'Roadmap' },
+  { key: 'buffs',   label: 'Buffs' },
+];
+
+function ViewToggle({ activeView, onSelect }) {
+  return (
+    <div className="flex gap-1 px-3 py-1.5 bg-[#0B1120]">
+      {VIEW_TABS.map(tab => (
+        <button
+          key={tab.key}
+          onClick={() => onSelect(tab.key)}
+          className={`flex-1 py-1.5 text-[11px] font-semibold rounded transition-colors cursor-pointer ${
+            activeView === tab.key
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-400 hover:text-gray-200 bg-[#111827]'
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 }
