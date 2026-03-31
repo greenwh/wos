@@ -30,6 +30,7 @@ export default function App() {
   const [data, setData] = useState(() => loadData());
   const [activeChief, setActiveChief] = useState(data.activeChief);
   const [importModal, setImportModal] = useState(null);
+  const [showRoadmap, setShowRoadmap] = useState(false);
 
   const chief = data.chiefs[activeChief];
 
@@ -40,8 +41,8 @@ export default function App() {
 
   const handleImport = useCallback(async (file) => {
     try {
-      const { heroes, suggestedName } = await importFile(file);
-      setImportModal({ heroes, suggestedName });
+      const { heroes, suggestedName, roadmap } = await importFile(file);
+      setImportModal({ heroes, suggestedName, roadmap });
     } catch (err) {
       alert('Failed to import: ' + err.message);
     }
@@ -49,6 +50,10 @@ export default function App() {
 
   const confirmImport = useCallback((chiefName) => {
     if (!chiefName || !importModal) return;
+    // Use imported roadmap if present, otherwise keep existing
+    const roadmap = importModal.roadmap != null
+      ? importModal.roadmap
+      : (data.chiefs[chiefName]?.roadmap || []);
     const newData = {
       ...data,
       chiefs: {
@@ -56,7 +61,7 @@ export default function App() {
         [chiefName]: {
           name: chiefName,
           heroes: importModal.heroes,
-          roadmap: data.chiefs[chiefName]?.roadmap || [],
+          roadmap,
         },
       },
       activeChief: chiefName,
@@ -114,6 +119,82 @@ export default function App() {
     updateData(newData);
   }, [data, chief, activeChief, updateData]);
 
+  const handleAddGoal = useCallback((goal) => {
+    if (!chief) return;
+    const roadmap = [...(chief.roadmap || []), goal];
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...chief, roadmap },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
+  const handleUpdateGoal = useCallback((updatedGoal) => {
+    if (!chief?.roadmap) return;
+    const roadmap = chief.roadmap.map(g => g.id === updatedGoal.id ? updatedGoal : g);
+    const updatedRoadmap = runAutoDetection(roadmap, chief.heroes);
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...chief, roadmap: updatedRoadmap },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
+  const handleDeleteGoal = useCallback((goalId) => {
+    if (!chief?.roadmap) return;
+    const roadmap = chief.roadmap.filter(g => g.id !== goalId);
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...chief, roadmap },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
+  const handleReorderGoal = useCallback((goalId, direction) => {
+    if (!chief?.roadmap) return;
+    const roadmap = [...chief.roadmap];
+    const idx = roadmap.findIndex(g => g.id === goalId);
+    if (idx === -1) return;
+    const newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= roadmap.length) return;
+    [roadmap[idx], roadmap[newIdx]] = [roadmap[newIdx], roadmap[idx]];
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...chief, roadmap },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
+  const handleToggleGoal = useCallback((goalId) => {
+    if (!chief?.roadmap) return;
+    const now = new Date().toISOString().slice(0, 10);
+    const updatedRoadmap = chief.roadmap.map(g => {
+      if (g.id !== goalId) return g;
+      const nowComplete = !g.completed;
+      return { ...g, completed: nowComplete, completedDate: nowComplete ? now : null };
+    });
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...chief, roadmap: updatedRoadmap },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
   return (
     <div className="min-h-screen bg-[#0B1120] max-w-lg mx-auto">
       {/* Header */}
@@ -142,6 +223,14 @@ export default function App() {
         onSaveHero={handleSaveHero}
         onDeleteHero={handleDeleteHero}
         onAddHero={handleAddHero}
+        showRoadmap={showRoadmap}
+        onViewRoadmap={() => setShowRoadmap(true)}
+        onCloseRoadmap={() => setShowRoadmap(false)}
+        onToggleGoal={handleToggleGoal}
+        onAddGoal={handleAddGoal}
+        onUpdateGoal={handleUpdateGoal}
+        onDeleteGoal={handleDeleteGoal}
+        onReorderGoal={handleReorderGoal}
       />
 
       {/* Import modal */}

@@ -72,6 +72,33 @@ export function exportChief(chief) {
   ];
   XLSX.utils.book_append_sheet(wb, ws3, 'Skills');
 
+  // Sheet 4: Roadmap
+  const ROADMAP_HEADERS = [
+    'Priority', 'Phase', 'Phase Label', 'Hero', 'Goal Type', 'Description',
+    'Target Slot', 'Target Value', 'Target Rarity', 'Skill Name', 'Skill Category',
+    'Manual Only', 'Completed', 'Completed Date', 'Mode Impact', 'Notes',
+  ];
+  const roadmapRows = (chief.roadmap || []).map((g, i) => [
+    i + 1,
+    g.phase,
+    g.phaseLabel,
+    g.heroName,
+    g.goalType,
+    g.description,
+    g.target?.gearSlot || '',
+    g.target?.targetEnhancement ?? g.target?.targetMF ?? g.target?.targetLevel ?? g.target?.targetStars ?? '',
+    g.target?.targetRarity || '',
+    g.target?.skillName || '',
+    g.target?.skillCategory || '',
+    g.manualOnly ? 'TRUE' : 'FALSE',
+    g.completed ? 'TRUE' : 'FALSE',
+    g.completedDate || '',
+    g.modeImpact || '',
+    g.notes || '',
+  ]);
+  const ws4 = XLSX.utils.aoa_to_sheet([ROADMAP_HEADERS, ...roadmapRows]);
+  XLSX.utils.book_append_sheet(wb, ws4, 'Roadmap');
+
   // Trigger download
   XLSX.writeFile(wb, `${chief.name.toLowerCase()}_hero_tracker.xlsx`);
 }

@@ -3,6 +3,7 @@ import { RARITY_ORDER } from '../lib/constants';
 import HeroRow from './HeroRow';
 import EmptyState from './EmptyState';
 import RoadmapDashboard from './RoadmapDashboard';
+import RoadmapView from './RoadmapView';
 
 function sortHeroes(heroes) {
   const active = heroes
@@ -20,7 +21,7 @@ function sortHeroes(heroes) {
   return { active, bench };
 }
 
-export default function ChiefView({ chief, heroes, roadmap, onSaveHero, onDeleteHero, onAddHero }) {
+export default function ChiefView({ chief, heroes, roadmap, onSaveHero, onDeleteHero, onAddHero, showRoadmap, onViewRoadmap, onCloseRoadmap, onToggleGoal, onAddGoal, onUpdateGoal, onDeleteGoal, onReorderGoal }) {
   const [benchOpen, setBenchOpen] = useState(false);
   const [expandedHero, setExpandedHero] = useState(null);
   const [editingHero, setEditingHero] = useState(null);
@@ -89,8 +90,22 @@ export default function ChiefView({ chief, heroes, roadmap, onSaveHero, onDelete
 
   return (
     <div>
+      {/* Full Roadmap View (slide-up) */}
+      {showRoadmap && (
+        <RoadmapView
+          roadmap={roadmap}
+          heroes={heroes}
+          onClose={onCloseRoadmap}
+          onToggleGoal={onToggleGoal}
+          onAddGoal={onAddGoal}
+          onUpdateGoal={onUpdateGoal}
+          onDeleteGoal={onDeleteGoal}
+          onReorderGoal={onReorderGoal}
+        />
+      )}
+
       {/* Roadmap Dashboard */}
-      <RoadmapDashboard roadmap={roadmap} heroes={heroes} />
+      <RoadmapDashboard roadmap={roadmap} heroes={heroes} onViewRoadmap={onViewRoadmap} />
 
       {/* Active Roster */}
       {active.length > 0 && (

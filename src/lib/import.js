@@ -112,6 +112,52 @@ export function parseWorkbook(workbook) {
   return Object.values(heroMap);
 }
 
+const MANUAL_ONLY_TYPES = ['gear_acquire', 'shard_accumulate', 'weapon_upgrade', 'chief_gear', 'general'];
+
+function parseRoadmapSheet(workbook) {
+  const sheet = workbook.Sheets['Roadmap'];
+  if (!sheet) return null;
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  if (!rows.length) return [];
+
+  return rows.map((row, i) => {
+    const goalType = str(row['Goal Type']) || 'general';
+    const target = {};
+    const slot = str(row['Target Slot']);
+    const val = num(row['Target Value']);
+
+    if (['gear_enhancement', 'gear_mf', 'gear_acquire'].includes(goalType) && slot) {
+      target.gearSlot = slot;
+    }
+    if (goalType === 'gear_enhancement' && val != null) target.targetEnhancement = val;
+    if (goalType === 'gear_mf' && val != null) target.targetMF = val;
+    if (goalType === 'gear_acquire') target.targetRarity = str(row['Target Rarity']) || '';
+    if (goalType === 'skill_level') {
+      target.skillName = str(row['Skill Name']);
+      target.skillCategory = str(row['Skill Category']) || 'exploration';
+      if (val != null) target.targetLevel = val;
+    }
+    if (goalType === 'star_ascension' && val != null) target.targetStars = val;
+
+    const completed = str(row['Completed']).toUpperCase() === 'TRUE';
+
+    return {
+      id: `imp-${i + 1}-${Date.now().toString(36)}`,
+      phase: num(row['Phase']) || 1,
+      phaseLabel: str(row['Phase Label']) || '',
+      heroName: str(row['Hero']),
+      goalType,
+      description: str(row['Description']) || '',
+      target,
+      manualOnly: str(row['Manual Only']).toUpperCase() === 'TRUE' || MANUAL_ONLY_TYPES.includes(goalType),
+      completed,
+      completedDate: str(row['Completed Date']) || null,
+      modeImpact: str(row['Mode Impact']),
+      notes: str(row['Notes']),
+    };
+  });
+}
+
 export function importFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -119,10 +165,11 @@ export function importFile(file) {
       try {
         const wb = XLSX.read(e.target.result, { type: 'array' });
         const heroes = parseWorkbook(wb);
+        const roadmap = parseRoadmapSheet(wb);
         // Try to detect chief name from filename
         const match = file.name.match(/^(\w+)_hero_tracker/i);
         const suggestedName = match ? match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase() : '';
-        resolve({ heroes, suggestedName });
+        resolve({ heroes, suggestedName, roadmap });
       } catch (err) {
         reject(err);
       }
