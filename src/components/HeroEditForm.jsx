@@ -119,7 +119,8 @@ export default function HeroEditForm({ hero, onSave, onCancel, onDelete }) {
             type="number"
             inputMode="numeric"
             value={form.level}
-            onChange={e => set('level', clamp(e.target.value, 1, 99) ?? 1)}
+            onChange={e => set('level', e.target.value === '' ? '' : parseInt(e.target.value) || '')}
+            onBlur={() => set('level', clamp(form.level, 1, 99) ?? 1)}
             className={`${inputClass} ${errors.level ? 'border-red-500' : ''}`}
           />
         </div>
