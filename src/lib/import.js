@@ -22,10 +22,16 @@ function str(val) {
 
 const SLOT_ORDER = ['Goggles', 'Gloves', 'Belt', 'Boots'];
 
+function findSheet(workbook, name, fallbackIndex) {
+  // Try exact name match first, then fallback to index
+  if (workbook.Sheets[name]) return workbook.Sheets[name];
+  return workbook.Sheets[workbook.SheetNames[fallbackIndex]] || null;
+}
+
 export function parseWorkbook(workbook) {
-  const heroSheet = workbook.Sheets[workbook.SheetNames[0]];
-  const gearSheet = workbook.Sheets[workbook.SheetNames[1]];
-  const skillSheet = workbook.Sheets[workbook.SheetNames[2]];
+  const heroSheet = findSheet(workbook, 'Hero Overview', 0);
+  const gearSheet = findSheet(workbook, 'Gear Detail', 1);
+  const skillSheet = findSheet(workbook, 'Skills', 2);
 
   // Parse Hero Overview
   const heroRows = XLSX.utils.sheet_to_json(heroSheet);
