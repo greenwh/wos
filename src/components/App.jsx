@@ -8,6 +8,7 @@ import ChiefView from './ChiefView';
 import ActionBar from './ActionBar';
 import BuffTab from './BuffTab';
 import PetsView from './PetsView';
+import RatiosView from './RatiosView';
 
 function newHero() {
   return {
@@ -308,6 +309,8 @@ export default function App() {
         />
       )}
 
+      {activeView === 'ratios' && <RatiosView />}
+
       {/* Import modal */}
       {importModal && (
         <ImportModal
@@ -326,6 +329,7 @@ const VIEW_TABS = [
   { key: 'roadmap', label: 'Roadmap' },
   { key: 'pets',    label: 'Pets' },
   { key: 'buffs',   label: 'Buffs' },
+  { key: 'ratios',  label: 'Ratios' },
 ];
 
 function ViewToggle({ activeView, onSelect }) {

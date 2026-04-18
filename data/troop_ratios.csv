@@ -1,0 +1,25 @@
+code,activity,role,infantry,lancer,marksman,reasoning,gen_note
+PVP,Open-Field PvP / City Burn,LEAD,50,20,30,"Standard offensive rally. Joiners fill most of the troops anyway; lead keeps a balanced core so the rally doesn't collapse if joiners under-deliver.",
+PVP,Open-Field PvP / City Burn,JOIN,50,20,30,"Hard-to-counter balanced joiner composition. Infantry survives long enough for marksman to deliver damage. The most widely cited ratio across all 2025-2026 guides.",
+PVP,Open-Field PvP / City Burn,GARR,60,20,20,"Defensive lean with some damage retained. 60/20/20 beats pure 60/40/0 for opportunistic counter-damage against unbalanced rallies.",
+FAC,Facility Battle (Foundry/Fortress/Stronghold),LEAD,50,20,30,"Facility rallies use the same PvP balanced lead. Whiteout-survival.com's Foundry guide and multiple Fortress guides converge on this.",
+FAC,Facility Battle (Foundry/Fortress/Stronghold),JOIN,50,20,30,"Standard joiner. In chaotic multi-rally Foundry fights you're taking constant hits so the 50% infantry buffer matters.",
+FAC,Facility Battle (Foundry/Fortress/Stronghold),GARR,60,20,20,"Defensive reinforcement. Some alliances go 60/40/0 if expecting sustained rallies with no counter-damage need.",
+SFC,Sunfire Castle (SvS),LEAD,50,20,30,"Confirmed by the 2026 SvS formation meta. Alliance-level standard for T9/T10 attack rallies on the castle.",
+SFC,Sunfire Castle (SvS),JOIN,50,20,30,"Default SFC joiner. Some alliances bump to 60/20/20 for sustained multi-wave fights where hospital overflow is a concern.",
+SFC,Sunfire Castle (SvS),GARR,60,40,0,"Consensus garrison ratio. Castle turrets target infantry first so infantry-heavy survives longer; lancers provide secondary damage. 70/30/0 is a lighter-damage alternative.",
+SVS,SvS Battle Phase (open-world),LEAD,50,20,30,"Open-world SvS flag fights use standard attack.",
+SVS,SvS Battle Phase (open-world),JOIN,50,20,30,"Standard joiner.",
+SVS,SvS Battle Phase (open-world),GARR,70,30,0,"Heavier infantry defense during SvS when your city may be hit while offline. Per widely circulated alliance cheat sheets.",
+BHT,Bear Trap,LEAD,0,10,90,"Pure PvE. Bear has fixed HP and no counter triangle so maximize lethality. Joiners bring the infantry meat shield. Server Gen 8+: push to 0/15/85 or 0/10/90 pure DPS.",Gen 1-7: keep at least 5000 infantry in the march as a safety floor. The 0% lancer can stretch to 15-20% pre-Gen 8 if your lancer lethality is close to marksman.
+BHT,Bear Trap,JOIN,20,20,60,"Pre-Gen 8 balance point: some infantry to absorb hits and stabilize lancer/marksman skill triggers. Gen 8+: shift to 10/15/75 as marksman lethality pulls ahead.",Gen-dependent. Pre-Gen 8 the 25-30% lancer is common to stably proc lancer hero buffs.
+PLT,Polar Terror,LEAD,0,10,90,"Same logic as Bear Trap — PvE boss with no counter triangle. Maximize marksman for peak damage.",Same gen-sensitivity as Bear Trap.
+PLT,Polar Terror,JOIN,20,20,60,"Balanced joiner; enough infantry to survive across levels without being glass cannons.",
+BNT,Intel Bounty Beast (Expert+),SOLO,20,40,40,"Bounty missions recommend unrealistic power levels — the workaround is ratio + synergy. 20/40/40 from the 2026 Lighthouse meta beats the recommended power by 20-30M. Prior 20/20/60 advice is outdated for Expert+.",
+LAB,Labyrinth (PvE),SOLO,50,20,30,"Game AI defaults to 33/33/33 which is suboptimal — override to 50/20/30 as a baseline. Labyrinth zones vary daily so expect to fine-tune. The 60/15/25 variant works well for infantry-favored zones (e.g. stage 10 which the AI itself runs at ~53/27/20).",Experiment within 5 daily attempts; the zone's expedition buffs change the optimal ratio.
+CJO,Crazy Joe (HQ & reinforce),GARR,90,10,0,"Infantry attacks first, then lancers, then marksmen. Marksmen rarely get a turn before the wave dies so they're dead weight. Wave 10 and 20 HQ defense especially.",Applies across all server generations.
+CJO,Crazy Joe (HQ & reinforce),SOLO,90,10,0,"Same as garrison — reinforcement marches sent to allies use the same composition.",
+ACH,Alliance Championship,LEAD,50,20,30,"Standard AC meta; hard to counter. Works with any generation of heroes.",
+ACH,Alliance Championship,JOIN,50,20,30,"Standard balanced composition. The in-game default of 33/33/33 is worse — manually set sliders.",
+CTY,City Defense (shield down),GARR,60,20,20,"General-purpose city garrison. Heavier infantry with lancer/marksman retained to counter-damage. If specifically expecting SvS raid pressure, shift to 70/30/0.",
+DEF,Default / Unsure,SOLO,50,20,30,"Safest fallback when you don't know what you'll face. Multiple creators name this the 'can't go wrong' starting point.",
