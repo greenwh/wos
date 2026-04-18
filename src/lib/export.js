@@ -99,6 +99,26 @@ export function exportChief(chief) {
   const ws4 = XLSX.utils.aoa_to_sheet([ROADMAP_HEADERS, ...roadmapRows]);
   XLSX.utils.book_append_sheet(wb, ws4, 'Roadmap');
 
+  // Sheet 5: Pets
+  if (chief.pets && chief.pets.length > 0) {
+    const petsData = chief.pets.map(p => ({
+      'Pet': p.name,
+      'Generation': p.generation,
+      'Rarity': p.rarity,
+      'Status': p.status,
+      'Level': p.level || (p.status === 'Locked' ? '-' : 0),
+      'Advancement': p.advancement || (p.status === 'Locked' ? '-' : 0),
+      'Active Skill': p.activeSkill || '',
+      'Active Skill Effect': p.activeSkillEffect || '',
+      'Refinement Focus': p.refinementFocus || '',
+      'Unlock Requirement': p.unlockRequirement || '',
+      'Priority': p.priority || '',
+      'Notes': p.notes || '',
+    }));
+    const ws5 = XLSX.utils.json_to_sheet(petsData);
+    XLSX.utils.book_append_sheet(wb, ws5, 'Pets');
+  }
+
   // Trigger download
   XLSX.writeFile(wb, `${chief.name.toLowerCase()}_hero_tracker.xlsx`);
 }

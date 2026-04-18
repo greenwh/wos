@@ -95,6 +95,7 @@ export default function ChiefView({ chief, heroes, roadmap, onSaveHero, onDelete
         <RoadmapView
           roadmap={roadmap}
           heroes={heroes}
+          chief={chief}
           onClose={onCloseRoadmap}
           onToggleGoal={onToggleGoal}
           onAddGoal={onAddGoal}
@@ -105,7 +106,7 @@ export default function ChiefView({ chief, heroes, roadmap, onSaveHero, onDelete
       )}
 
       {/* Roadmap Dashboard */}
-      <RoadmapDashboard roadmap={roadmap} heroes={heroes} onViewRoadmap={onViewRoadmap} />
+      <RoadmapDashboard roadmap={roadmap} heroes={heroes} chief={chief} onViewRoadmap={onViewRoadmap} />
 
       {/* Active Roster */}
       {active.length > 0 && (

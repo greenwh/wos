@@ -161,6 +161,28 @@ function parseRoadmapSheet(workbook) {
   });
 }
 
+function parsePetsSheet(workbook) {
+  const sheet = workbook.Sheets['Pets'];
+  if (!sheet) return null;
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  if (!rows.length) return [];
+
+  return rows.map(row => ({
+    name: str(row['Pet']),
+    generation: num(row['Generation']) || 1,
+    rarity: str(row['Rarity']),
+    status: str(row['Status']) || 'Locked',
+    level: (() => { const v = row['Level']; return (v == null || v === '-' || v === '') ? 0 : (num(v) ?? 0); })(),
+    advancement: (() => { const v = row['Advancement']; return (v == null || v === '-' || v === '') ? 0 : (num(v) ?? 0); })(),
+    activeSkill: str(row['Active Skill']),
+    activeSkillEffect: str(row['Active Skill Effect']),
+    refinementFocus: str(row['Refinement Focus']),
+    unlockRequirement: str(row['Unlock Requirement']),
+    priority: str(row['Priority']),
+    notes: str(row['Notes']),
+  }));
+}
+
 export function importFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -169,10 +191,11 @@ export function importFile(file) {
         const wb = XLSX.read(e.target.result, { type: 'array' });
         const heroes = parseWorkbook(wb);
         const roadmap = parseRoadmapSheet(wb);
+        const pets = parsePetsSheet(wb);
         // Try to detect chief name from filename
         const match = file.name.match(/^(\w+)_hero_tracker/i);
         const suggestedName = match ? match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase() : '';
-        resolve({ heroes, suggestedName, roadmap });
+        resolve({ heroes, suggestedName, roadmap, pets });
       } catch (err) {
         reject(err);
       }

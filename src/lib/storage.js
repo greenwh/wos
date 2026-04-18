@@ -1,9 +1,10 @@
 import { SEED_DATA } from '../data/seed';
 import { seedRoadmapIfNeeded } from '../data/roadmapSeed';
 import { seedBuffStrategyIfNeeded } from '../data/buffSeed';
+import { seedPetsIfNeeded } from '../data/petsSeed';
 
 const STORAGE_KEY = 'wos-hero-tracker';
-const CURRENT_VERSION = 3;
+const CURRENT_VERSION = 4;
 
 function migrate(data) {
   if (!data.version || data.version < 2) {
@@ -24,9 +25,19 @@ function migrate(data) {
     }
     data.version = 3;
   }
+  if (data.version < 4) {
+    // v3 → v4: add empty pets array to all chiefs
+    for (const chief of Object.values(data.chiefs)) {
+      if (!chief.pets) {
+        chief.pets = [];
+      }
+    }
+    data.version = 4;
+  }
   // Seed Wally/Beav roadmaps and buff strategies if empty
   seedRoadmapIfNeeded(data);
   seedBuffStrategyIfNeeded(data);
+  seedPetsIfNeeded(data);
   return data;
 }
 

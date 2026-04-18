@@ -7,6 +7,7 @@ import ChiefTabs from './ChiefTabs';
 import ChiefView from './ChiefView';
 import ActionBar from './ActionBar';
 import BuffTab from './BuffTab';
+import PetsView from './PetsView';
 
 function newHero() {
   return {
@@ -42,8 +43,8 @@ export default function App() {
 
   const handleImport = useCallback(async (file) => {
     try {
-      const { heroes, suggestedName, roadmap } = await importFile(file);
-      setImportModal({ heroes, suggestedName, roadmap });
+      const { heroes, suggestedName, roadmap, pets } = await importFile(file);
+      setImportModal({ heroes, suggestedName, roadmap, pets });
     } catch (err) {
       alert('Failed to import: ' + err.message);
     }
@@ -51,10 +52,13 @@ export default function App() {
 
   const confirmImport = useCallback((chiefName) => {
     if (!chiefName || !importModal) return;
-    // Use imported roadmap if present, otherwise keep existing
+    // Use imported roadmap/pets if present, otherwise keep existing
     const roadmap = importModal.roadmap != null
       ? importModal.roadmap
       : (data.chiefs[chiefName]?.roadmap || []);
+    const pets = importModal.pets != null
+      ? importModal.pets
+      : (data.chiefs[chiefName]?.pets || []);
     const newData = {
       ...data,
       chiefs: {
@@ -63,6 +67,7 @@ export default function App() {
           name: chiefName,
           heroes: importModal.heroes,
           roadmap,
+          pets,
           buffStrategy: data.chiefs[chiefName]?.buffStrategy || { items: [], preEventChecklist: [] },
         },
       },
@@ -79,12 +84,13 @@ export default function App() {
 
   const handleSaveHero = useCallback((oldName, updatedHero) => {
     const heroes = chief.heroes.map(h => h.name === oldName ? updatedHero : h);
-    const updatedRoadmap = runAutoDetection(chief.roadmap, heroes);
+    const updatedChief = { ...chief, heroes };
+    const updatedRoadmap = runAutoDetection(chief.roadmap, updatedChief);
     const newData = {
       ...data,
       chiefs: {
         ...data.chiefs,
-        [activeChief]: { ...chief, heroes, roadmap: updatedRoadmap },
+        [activeChief]: { ...updatedChief, roadmap: updatedRoadmap },
       },
     };
     updateData(newData);
@@ -137,7 +143,7 @@ export default function App() {
   const handleUpdateGoal = useCallback((updatedGoal) => {
     if (!chief?.roadmap) return;
     const roadmap = chief.roadmap.map(g => g.id === updatedGoal.id ? updatedGoal : g);
-    const updatedRoadmap = runAutoDetection(roadmap, chief.heroes);
+    const updatedRoadmap = runAutoDetection(roadmap, chief);
     const newData = {
       ...data,
       chiefs: {
@@ -186,6 +192,21 @@ export default function App() {
       chiefs: {
         ...data.chiefs,
         [activeChief]: { ...chief, buffStrategy },
+      },
+    };
+    updateData(newData);
+  }, [data, chief, activeChief, updateData]);
+
+  const handleUpdatePet = useCallback((updatedPet) => {
+    if (!chief) return;
+    const pets = (chief.pets || []).map(p => p.name === updatedPet.name ? updatedPet : p);
+    const updatedChief = { ...chief, pets };
+    const updatedRoadmap = runAutoDetection(chief.roadmap, updatedChief);
+    const newData = {
+      ...data,
+      chiefs: {
+        ...data.chiefs,
+        [activeChief]: { ...updatedChief, roadmap: updatedRoadmap },
       },
     };
     updateData(newData);
@@ -271,6 +292,13 @@ export default function App() {
         />
       )}
 
+      {activeView === 'pets' && (
+        <PetsView
+          pets={chief?.pets}
+          onUpdatePet={handleUpdatePet}
+        />
+      )}
+
       {activeView === 'buffs' && (
         <BuffTab
           buffStrategy={chief?.buffStrategy}
@@ -296,6 +324,7 @@ export default function App() {
 const VIEW_TABS = [
   { key: 'roster',  label: 'Roster' },
   { key: 'roadmap', label: 'Roadmap' },
+  { key: 'pets',    label: 'Pets' },
   { key: 'buffs',   label: 'Buffs' },
 ];
 

@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { runAutoDetection, getGoalProgress, PHASE_COLORS } from '../lib/roadmap';
 
-export default function RoadmapDashboard({ roadmap, heroes, onViewRoadmap }) {
+export default function RoadmapDashboard({ roadmap, heroes, chief, onViewRoadmap }) {
   const { goals, totalCount } = useMemo(() => {
     if (!roadmap || !heroes) return { goals: [], totalCount: 0 };
-    const detected = runAutoDetection(roadmap, heroes);
+    const detected = runAutoDetection(roadmap, chief || { heroes, pets: [] });
     const incomplete = detected.filter(g => !g.completed);
     return { goals: incomplete.slice(0, 3), totalCount: detected.length };
   }, [roadmap, heroes]);

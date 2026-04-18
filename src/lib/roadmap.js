@@ -2,23 +2,26 @@
  * Auto-detection and progress calculation for roadmap goals.
  */
 
-export function detectGoalCompletion(goal, heroes) {
+export function detectGoalCompletion(goal, chief) {
   if (goal.manualOnly) return goal.completed;
   if (goal.completed) return true;
 
+  const heroes = chief.heroes || [];
   const hero = heroes.find(h => h.name === goal.heroName);
-  if (!hero) return goal.completed;
 
   switch (goal.goalType) {
     case "gear_enhancement": {
+      if (!hero) return goal.completed;
       const gear = hero.gear.find(g => g.slot === goal.target.gearSlot);
       return gear ? (gear.enhancement ?? 0) >= (goal.target.targetEnhancement ?? Infinity) : false;
     }
     case "gear_mf": {
+      if (!hero) return goal.completed;
       const gear = hero.gear.find(g => g.slot === goal.target.gearSlot);
       return gear ? (gear.masterForgery ?? 0) >= (goal.target.targetMF ?? Infinity) : false;
     }
     case "skill_level": {
+      if (!hero) return goal.completed;
       const skills = goal.target.skillCategory === "exploration"
         ? hero.skills.exploration
         : hero.skills.expedition;
@@ -26,14 +29,21 @@ export function detectGoalCompletion(goal, heroes) {
       return skill ? skill.level >= (goal.target.targetLevel ?? Infinity) : false;
     }
     case "star_ascension": {
+      if (!hero) return goal.completed;
       return hero.stars >= (goal.target.targetStars ?? Infinity);
     }
-    case "pet_capture":
-    case "pet_level":
+    case "pet_capture": {
+      const pet = chief.pets?.find(p => p.name === goal.heroName);
+      return pet ? pet.status === "Captured" : false;
+    }
+    case "pet_level": {
+      const pet = chief.pets?.find(p => p.name === goal.heroName);
+      return pet ? pet.level >= (goal.target.targetLevel ?? Infinity) : false;
+    }
     case "pet_refine":
     case "chief_gear":
     case "hoard":
-      return goal.completed;  // manual-only until Phase B adds pet model
+      return goal.completed;
     default:
       return goal.completed;
   }
@@ -43,12 +53,12 @@ export function detectGoalCompletion(goal, heroes) {
  * Run auto-detection across all goals for a chief, updating completed/completedDate.
  * Returns a new roadmap array (does not mutate).
  */
-export function runAutoDetection(roadmap, heroes) {
-  if (!roadmap || !heroes) return roadmap || [];
+export function runAutoDetection(roadmap, chief) {
+  if (!roadmap || !chief) return roadmap || [];
   const now = new Date().toISOString().slice(0, 10);
   return roadmap.map(goal => {
     const wasComplete = goal.completed;
-    const isComplete = detectGoalCompletion(goal, heroes);
+    const isComplete = detectGoalCompletion(goal, chief);
     if (isComplete && !wasComplete) {
       return { ...goal, completed: true, completedDate: now };
     }

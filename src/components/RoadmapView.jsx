@@ -2,27 +2,38 @@ import { useState, useMemo } from 'react';
 import { runAutoDetection, getGoalProgress, PHASE_COLORS } from '../lib/roadmap';
 import GoalEditor from './GoalEditor';
 
-export default function RoadmapView({ roadmap, heroes, onClose, onToggleGoal, onAddGoal, onUpdateGoal, onDeleteGoal, onReorderGoal }) {
+export default function RoadmapView({ roadmap, heroes, chief, onClose, onToggleGoal, onAddGoal, onUpdateGoal, onDeleteGoal, onReorderGoal }) {
   const [collapsedCompleted, setCollapsedCompleted] = useState({});
   const [editingGoal, setEditingGoal] = useState(null); // null = closed, {} = add new, goal object = editing
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [goalFilter, setGoalFilter] = useState('all');
 
   const detected = useMemo(() => {
     if (!roadmap || !heroes) return [];
-    return runAutoDetection(roadmap, heroes);
-  }, [roadmap, heroes]);
+    return runAutoDetection(roadmap, chief || { heroes, pets: [] });
+  }, [roadmap, heroes, chief]);
+
+  const PET_TYPES = ['pet_capture', 'pet_level', 'pet_refine'];
+  const filtered = useMemo(() => {
+    if (goalFilter === 'all') return detected;
+    if (goalFilter === 'heroes') return detected.filter(g => !PET_TYPES.includes(g.goalType) && g.goalType !== 'chief_gear' && g.goalType !== 'hoard');
+    if (goalFilter === 'pets') return detected.filter(g => PET_TYPES.includes(g.goalType));
+    if (goalFilter === 'chief_gear') return detected.filter(g => g.goalType === 'chief_gear');
+    if (goalFilter === 'hoard') return detected.filter(g => g.goalType === 'hoard');
+    return detected;
+  }, [detected, goalFilter]);
 
   // Group goals by phase, preserving priority order within each phase
   const phases = useMemo(() => {
     const map = new Map();
-    detected.forEach((goal, idx) => {
+    filtered.forEach((goal, idx) => {
       if (!map.has(goal.phase)) {
         map.set(goal.phase, { phase: goal.phase, label: goal.phaseLabel, goals: [] });
       }
       map.get(goal.phase).goals.push({ ...goal, _globalIdx: idx });
     });
     return Array.from(map.values()).sort((a, b) => a.phase - b.phase);
-  }, [detected]);
+  }, [filtered]);
 
   const totalCount = detected.length;
 
@@ -61,6 +72,29 @@ export default function RoadmapView({ roadmap, heroes, onClose, onToggleGoal, on
         >
           + Add
         </button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="flex gap-1 px-3 py-1.5 bg-[#0B1120] border-b border-gray-800 shrink-0 overflow-x-auto">
+        {[
+          { key: 'all', label: 'All' },
+          { key: 'heroes', label: 'Heroes' },
+          { key: 'pets', label: 'Pets' },
+          { key: 'chief_gear', label: 'Chief' },
+          { key: 'hoard', label: 'Hoard' },
+        ].map(f => (
+          <button
+            key={f.key}
+            onClick={() => setGoalFilter(f.key)}
+            className={`px-2.5 py-1 text-[10px] font-semibold rounded transition-colors cursor-pointer whitespace-nowrap ${
+              goalFilter === f.key
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-gray-200 bg-[#111827]'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
 
       {/* Scrollable content */}
