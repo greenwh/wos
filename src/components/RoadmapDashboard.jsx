@@ -46,15 +46,24 @@ export default function RoadmapDashboard({ roadmap, heroes, onViewRoadmap }) {
   );
 }
 
+const NON_HERO_ICONS = {
+  pet_capture: "\u{1F43E}",
+  pet_level: "\u{1F43E}",
+  pet_refine: "\u{1F43E}",
+  chief_gear: "\u{1F3F0}",
+  hoard: "\u{1F48E}",
+};
+
 function GoalRow({ goal, index, heroes }) {
   const progress = getGoalProgress(goal, heroes);
   const color = PHASE_COLORS[goal.phase] || PHASE_COLORS[1];
+  const icon = NON_HERO_ICONS[goal.goalType] || "";
 
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline gap-1.5">
         <span className="text-[10px] text-gray-500 font-mono w-3 shrink-0">{index}.</span>
-        <span className="text-xs text-gray-200 truncate">{goal.description}</span>
+        <span className="text-xs text-gray-200 truncate">{icon ? `${icon} ` : ""}{goal.description}</span>
       </div>
       <div className="flex items-center gap-2 ml-[18px]">
         {/* Progress bar */}

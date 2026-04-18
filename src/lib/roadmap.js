@@ -28,6 +28,12 @@ export function detectGoalCompletion(goal, heroes) {
     case "star_ascension": {
       return hero.stars >= (goal.target.targetStars ?? Infinity);
     }
+    case "pet_capture":
+    case "pet_level":
+    case "pet_refine":
+    case "chief_gear":
+    case "hoard":
+      return goal.completed;  // manual-only until Phase B adds pet model
     default:
       return goal.completed;
   }
@@ -91,6 +97,10 @@ export function getGoalProgress(goal, heroes) {
     case "shard_accumulate":
     case "weapon_upgrade":
     case "chief_gear":
+    case "pet_capture":
+    case "pet_level":
+    case "pet_refine":
+    case "hoard":
     case "general":
     default:
       return { current: goal.completed ? 1 : 0, target: 1, label: goal.completed ? "Done" : "Manual", pct: goal.completed ? 1 : 0 };
@@ -104,4 +114,7 @@ export const PHASE_COLORS = {
   3: "#F59E0B", // amber
   4: "#A78BFA", // purple
   5: "#9CA3AF", // gray
+  6: "#14B8A6", // teal
+  7: "#F43F5E", // rose
+  8: "#64748B", // slate
 };

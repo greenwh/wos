@@ -138,6 +138,9 @@ function parseRoadmapSheet(workbook) {
       if (val != null) target.targetLevel = val;
     }
     if (goalType === 'star_ascension' && val != null) target.targetStars = val;
+    if (goalType === 'pet_capture') target.targetRarity = str(row['Target Rarity']) || '';
+    if (goalType === 'pet_level' && val != null) target.targetLevel = val;
+    if (goalType === 'pet_refine') target.targetRarity = str(row['Target Rarity']) || '';
 
     const completed = str(row['Completed']).toUpperCase() === 'TRUE';
 

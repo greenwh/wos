@@ -10,6 +10,10 @@ const GOAL_TYPES = [
   { value: 'shard_accumulate', label: 'Shard Accumulate' },
   { value: 'weapon_upgrade', label: 'Weapon Upgrade' },
   { value: 'chief_gear', label: 'Chief Gear' },
+  { value: 'pet_capture', label: 'Pet Capture' },
+  { value: 'pet_level', label: 'Pet Level' },
+  { value: 'pet_refine', label: 'Pet Refine' },
+  { value: 'hoard', label: 'Hoard' },
   { value: 'general', label: 'General' },
 ];
 
@@ -62,7 +66,7 @@ export default function GoalEditor({ goal, heroes, onSave, onCancel }) {
 
   const [autoDesc, setAutoDesc] = useState(!isEdit);
 
-  const PHASE_LABELS = { 1: 'Immediate', 2: 'Mid-Term', 3: 'Skill Gaps', 4: 'Transition', 5: 'Endgame' };
+  const PHASE_LABELS = { 1: 'Immediate – Deploy Hoard', 2: 'Pet Gen 1 – Development Foundation', 3: 'Chief Gear – Furnace 22 Path', 4: 'Lv5 Pushes', 5: 'Skill & Gear Gap Fills', 6: 'Alonzo Transition (Deferred)', 7: 'Bench – No Investment', 8: 'Long-Term – Mia Prep' };
 
   const handlePhaseChange = (val) => {
     const p = parseInt(val) || 1;
@@ -90,6 +94,9 @@ export default function GoalEditor({ goal, heroes, onSave, onCancel }) {
       target.targetLevel = parseInt(targetLevel) || 1;
     }
     if (goalType === 'star_ascension') target.targetStars = parseInt(targetStars) || 1;
+    if (goalType === 'pet_capture') target.targetRarity = targetRarity;
+    if (goalType === 'pet_level') target.targetLevel = parseInt(targetLevel) || 1;
+    if (goalType === 'pet_refine') target.targetRarity = targetRarity;
 
     const result = {
       id: goal?.id || generateId(),
@@ -228,7 +235,7 @@ export default function GoalEditor({ goal, heroes, onSave, onCancel }) {
             <div className="flex-1">
               <label className={labelClass}>Phase</label>
               <select value={phase} onChange={e => handlePhaseChange(e.target.value)} className={selectClass}>
-                {[1,2,3,4,5].map(p => <option key={p} value={p}>{p}</option>)}
+                {[1,2,3,4,5,6,7,8].map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div className="flex-1">

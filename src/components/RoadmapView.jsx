@@ -190,10 +190,19 @@ function PhaseGroup({ group, heroes, totalCount, collapsed, onToggleCollapse, on
   );
 }
 
+const NON_HERO_ICONS = {
+  pet_capture: "\u{1F43E}",
+  pet_level: "\u{1F43E}",
+  pet_refine: "\u{1F43E}",
+  chief_gear: "\u{1F3F0}",
+  hoard: "\u{1F48E}",
+};
+
 function GoalCard({ goal, heroes, totalCount, onToggle, onEdit, onDelete, onReorder, dimmed }) {
   const [showActions, setShowActions] = useState(false);
   const progress = getGoalProgress(goal, heroes);
   const color = PHASE_COLORS[goal.phase] || PHASE_COLORS[1];
+  const icon = NON_HERO_ICONS[goal.goalType] || "";
 
   return (
     <div
@@ -224,7 +233,7 @@ function GoalCard({ goal, heroes, totalCount, onToggle, onEdit, onDelete, onReor
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
             <span className={`text-xs text-gray-200 flex-1 ${dimmed ? 'line-through' : ''}`}>
-              {goal.description}
+              {icon ? `${icon} ` : ""}{goal.description}
             </span>
             {/* Actions toggle */}
             <button
